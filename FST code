@@ -1,0 +1,21 @@
+#FST code
+
+#Starting with VCF.gz anf VCF.gz.csi files 1) create a population_map.txt file containing your full name/id for each individual categorized by group (suvivor, deceased, high immune etc.)
+
+awk '$2 == "Survivor" {print $1}' population_map.txt > survivor.txt
+awk '$2 == "Deceased" {print $1}' population_map.txt > deceased.txt
+awk '$2 == "High Immune" {print $1}' population_map.txt > high_immune.txt
+
+#2) Compute Fst Between Groups
+
+#Survivor vs. Deceased
+
+vcftools --gzvcf merged_all.vcf.gz --weir-fst-pop survivor.txt --weir-fst-pop deceased.txt --out Fst_survivor_vs_deceased
+
+#Survivor vs. high immune
+
+vcftools --gzvcf merged_all.vcf.gz --weir-fst-pop survivor.txt --weir-fst-pop high_immune.txt --out Fst_survivor_vs_highimmune
+
+#Deceased vs. high immune
+
+vcftools --gzvcf merged_all.vcf.gz --weir-fst-pop deceased.txt --weir-fst-pop high_immune.txt --out Fst_deceased_vs_highimmune
