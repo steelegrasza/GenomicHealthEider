@@ -1,0 +1,24 @@
+module --force purge
+module load StdEnv/2020
+module load plink/1.9b_6.21-x86_64
+
+OUTDIR=/scratch/steeleg/contNe/qc_het
+mkdir -p "$OUTDIR"
+
+VCF=/scratch/steeleg/reheadered_filtered_allconcatenated.vcf
+
+plink \
+  --vcf "$VCF" \
+  --double-id \
+  --allow-extra-chr \
+  --keep-allele-order \
+  --snps-only just-acgt \
+  --biallelic-only strict \
+  --het \
+  --out "$OUTDIR/allcohort_inbreeding"
+
+awk 'NR==1{
+  for(i=1;i<=NF;i++){ if($i=="IID") iid=i; if($i=="F") f=i }
+  print "IID,Fhat3"; next
+}
+{ print $iid "," $f }' FS='[[:space:]]+' "$OUTDIR/allcohort_inbreeding.het" > "$OUTDIR/Inbreeding_Coefficients.csv"
